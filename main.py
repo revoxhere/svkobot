@@ -1,9 +1,11 @@
-# bot.py
 import os
 import discord
 import random
+from dotenv import load_dotenv
 
-TOKEN = '@@@'
+load_dotenv()
+TOKEN = os.getenv('TOKEN')
+
 client = discord.Client()
 
 
@@ -60,9 +62,12 @@ async def on_message(message):
         await message.channel.send(help_str)
 
     if message.content.startswith("svko image"):
-        image = os.listdir('/home/revox/Obrazy/responses/')
+        image = os.listdir('responses/')
         imgString = random.choice(image)
-        path = '/home/revox/Obrazy/responses/' + imgString
-        await message.channel.send("Random image from **revox's holy archive**:", file=discord.File(path))
+        path = 'responses/' + imgString
+        await message.channel.send(
+            "Random image from **revox's holy archive**:",
+            file=discord.File(path)
+        )
 
 client.run(TOKEN)
