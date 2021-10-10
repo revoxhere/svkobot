@@ -1,11 +1,14 @@
 import os
 import discord
 import random
+import scrapetube
+from time import sleep
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
 client = discord.Client()
+
 
 @client.event
 async def on_ready():
@@ -27,7 +30,19 @@ svko = [
     'yo',
     '?',
     '??',
-    'X D'
+    'X D',
+    'XD',
+    'bruh'
+]
+
+number_list = [
+    'you think you\'re funny?',
+    'well it\'s not 1999 so you cant break the system with that',
+    'fuck off with these "numbers"',
+    'provide a valid number you idiot',
+    'that is not a valid number',
+    'are you dumb or am i too advanced for you',
+    'i need a n-u-m-b-e-r, not this... thing'
 ]
 
 svko_hi = [
@@ -41,9 +56,34 @@ svko_hi = [
 help_str = """\
 **svkobot by revoxsvko**
 Available commands:
-    - svko image
+    - svko image [optional id]
     - svko help
+    - svko video:
+        - przygody
+        - revox
+        - revox2
+        - revox3
 """
+
+revox_videos = []
+revox = scrapetube.get_channel("UCgqCK9yt-ajwi4XBu4-jIvA")
+for video in revox:
+    revox_videos.append(video)
+
+revox2_videos = []
+revox2 = scrapetube.get_channel("UCiqkZT-vhW1bLl4uJI3sSfQ")
+for video in revox2:
+    revox2_videos.append(video)
+
+revox3_videos = []
+revox3 = scrapetube.get_channel("UC3jLSu6yMmJbKzKXpWQGmxA")
+for video in revox3:
+    revox3_videos.append(video)
+
+przygody_videos = []
+przygody = scrapetube.get_playlist("PL0nttajE9zQGOsryzY8Yv3GpnKE9u9ZSF")
+for video in przygody:
+    przygody_videos.append(video)
 
 
 @client.event
@@ -52,29 +92,75 @@ async def on_message(message):
         return
 
     mention = f'<@!{client.user.id}>'
-    if mention in message.content:
+    if mention in message.content.lower():
         response = random.choice(svko)
         await message.channel.send(
-            message.author.mention
-            + ", "
-            + response)
+            f"{message.author.mention}, {response}")
 
-    if message.content.startswith("svko"):
-        command = message.content.strip("svko ").split(" ")
+    if message.content in svko_hi:
+        response = random.choice(svko_hi)
+        await message.channel.send(response)
 
-        if command[0].lower() in svko_hi:
-            response = random.choice(svko_hi)
-            await message.channel.send(response)
+    if message.content.lower().startswith("svko"):
+        command = message.content.lower().replace("svko ", "").split(" ")
 
-        if command[0].lower() == "help":
+        if command[0] == "video":
+            if len(command) > 1:
+                if str(command[1]) == "przygody":
+                    text = "Here's your random **przygody revoxa w świecie CS:GO** video: "
+                    text += f"https://youtu.be/{random.choice(przygody_videos)['videoId']}"
+                    await message.channel.send(text)
+                elif str(command[1]) == "revox3":
+                    text = "Here's your random **revox3** video: "
+                    text += f"https://youtu.be/{random.choice(revox3_videos)['videoId']}"
+                    await message.channel.send(text)
+                elif str(command[1]) == "revox2":
+                    text = "Here's your random **revox2** video: "
+                    text += f"https://youtu.be/{random.choice(revox2_videos)['videoId']}"
+                    await message.channel.send(text)
+                elif str(command[1]) == "revox":
+                    text = "Here's your random **revox** video: "
+                    text += f"https://youtu.be/{random.choice(revox_videos)['videoId']}"
+                    await message.channel.send(text)
+                else:
+                    await message.channel.send("Usage: `svko video [przygody, revox, revox2, revox3]`")
+            else:
+                await message.channel.send("Usage: `svko video [przygody, revox, revox2, revox3]`")
+
+        if command[0] == "help":
             await message.channel.send(help_str)
 
-        if command[0].lower() == "image":
-            image = os.listdir('responses/')
-            imgString = random.choice(image)
-            path = 'responses/' + imgString
-            await message.channel.send(
-                "Random image from **revox's holy archive**:",
-                file=discord.File(path))
+        if command[0] == "image":
+            with message.channel.typing():
+                image = os.listdir('responses/')
+
+                if len(command) > 1:
+                    try:
+                        user_num = int(command[1])
+
+                        if user_num <= 0:
+                            await message.channel.send(random.choice(number_list))
+                            return
+
+                        elif len(image) < user_num:
+                            await message.channel.send(
+                                "i only have "+str(len(image))+" images, duh")
+                            return
+
+                        path = 'responses/' + image[user_num]
+                        await message.channel.send(
+                            "image *#"+str(command[1])+"* from **revox's holy archive**:",
+                            file=discord.File(path))
+                    except Exception as e:
+                        print(e)
+                        await message.channel.send(random.choice(number_list))
+                        return
+                else:
+                    random_num = random.randint(0, len(image)-1)
+                    path = 'responses/' + image[random_num]
+
+                    await message.channel.send(
+                        "random image *(#"+str(random_num)+")* from **revox's holy archive**:",
+                        file=discord.File(path))
 
 client.run(TOKEN)
