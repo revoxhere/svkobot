@@ -32,6 +32,8 @@ svko = [
     '??',
     'X D',
     'XD',
+    'XDD',
+    'XDDD',
     'bruh'
 ]
 
@@ -101,6 +103,10 @@ async def on_message(message):
         response = random.choice(svko_hi)
         await message.channel.send(response)
 
+    if message.content in svko:
+        response = random.choice(svko_hi)
+        await message.channel.send(response)
+
     if message.content.lower().startswith("svko"):
         command = message.content.lower().replace("svko ", "").split(" ")
 
@@ -144,10 +150,10 @@ async def on_message(message):
 
                         elif len(image) < user_num:
                             await message.channel.send(
-                                "i only have "+str(len(image))+" images, duh")
+                                f"i have like {len(image)} holy screenshots, not {user_num}")
                             return
 
-                        path = 'responses/' + image[user_num]
+                        path = 'responses/' + image[user_num-1]
                         await message.channel.send(
                             "image *#"+str(command[1])+"* from **revox's holy archive**:",
                             file=discord.File(path))
