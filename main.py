@@ -27,14 +27,6 @@ svko = [
     'i can tell',
     'stop pinging me',
     'use svko help if you need help (but not medical)',
-    'yo',
-    '?',
-    '??',
-    'X D',
-    'XD',
-    'XDD',
-    'XDDD',
-    'bruh'
 ]
 
 number_list = [
@@ -53,6 +45,40 @@ svko_hi = [
     'wassup',
     'hello',
     'hi'
+]
+
+svko_about = [
+    ':eyes:',
+    'me?',
+    'its me',
+    'kiss kiss'
+]
+
+svko_ask = [
+    '?',
+    '??',
+    'wtf?',
+    'wtf',
+    'ikr?'
+]
+
+svko_xd = [
+    'X D',
+    'XD',
+    'XDD',
+    'XDDD',
+    'XDDDD',
+    'XXDDDd',
+    'bruh'
+]
+
+svko_gen = [
+    'agree',
+    'what',
+    'ok',
+    'same',
+    'true',
+    'nope',
 ]
 
 help_str = """\
@@ -93,24 +119,44 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    mention = f'<@!{client.user.id}>'
-    if mention in message.content.lower():
+    if str(client.user.id).lower() in message.content.lower():
         response = random.choice(svko)
         await message.channel.send(
             f"{message.author.mention}, {response}")
 
-    if message.content in svko_hi:
-        response = random.choice(svko_hi)
+    if message.content in svko_gen:
+        response = random.choice(svko_gen)
         await message.channel.send(response)
 
-    if message.content in svko:
+    if message.content in svko_ask:
+        response = random.choice(svko_ask)
+        await message.channel.send(response)
+
+    if message.content in svko_xd:
+        response = random.choice(svko_xd)
+        await message.channel.send(response)
+
+    if message.content in svko_hi:
         response = random.choice(svko_hi)
         await message.channel.send(response)
 
     if message.content.lower().startswith("svko"):
         command = message.content.lower().replace("svko ", "").split(" ")
 
-        if command[0] == "video":
+        if command[0] == "avatar":
+            if message.author.guild_permissions.administrator:
+                try:
+                    avatar_path = "avatars/" + \
+                        random.choice(os.listdir('avatars/'))
+                    avatar = open(avatar_path, 'rb').read()
+                    await client.user.edit(avatar=avatar)
+                    await message.channel.send("Changed avatar!", file=discord.File(avatar_path))
+                except Exception as e:
+                    await message.channel.send(f"Error changing avatar: {e}")
+            else:
+                await message.channel.send("You're not an administrator!")
+
+        elif command[0] == "video":
             if len(command) > 1:
                 if str(command[1]) == "przygody":
                     text = "Here's your random **przygody revoxa w świecie CS:GO** video: "
@@ -133,10 +179,10 @@ async def on_message(message):
             else:
                 await message.channel.send("Usage: `svko video [przygody, revox, revox2, revox3]`")
 
-        if command[0] == "help":
+        elif command[0] == "help":
             await message.channel.send(help_str)
 
-        if command[0] == "image":
+        elif command[0] == "image":
             with message.channel.typing():
                 image = os.listdir('responses/')
 
@@ -155,7 +201,8 @@ async def on_message(message):
 
                         path = 'responses/' + image[user_num-1]
                         await message.channel.send(
-                            "image *#"+str(command[1])+"* from **revox's holy archive**:",
+                            "image *#" +
+                            str(command[1])+"* from **revox's holy archive**:",
                             file=discord.File(path))
                     except Exception as e:
                         print(e)
@@ -166,7 +213,12 @@ async def on_message(message):
                     path = 'responses/' + image[random_num]
 
                     await message.channel.send(
-                        "random image *(#"+str(random_num)+")* from **revox's holy archive**:",
+                        "random image *(#"+str(random_num) +
+                        ")* from **revox's holy archive**:",
                         file=discord.File(path))
+
+    elif 'svko' in message.content.lower():
+        response = random.choice(svko_about)
+        await message.channel.send(response)
 
 client.run(TOKEN)
