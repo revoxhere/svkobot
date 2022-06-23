@@ -1,6 +1,6 @@
 <!--
-*** Official Duino Stats Mini website README
-*** by revoxhere, 2021
+*** Official svkobot README
+*** by revoxhere, 2021-2022; thanks bila for sus finding
 -->
 
 <a href="https://duinocoin.com">
